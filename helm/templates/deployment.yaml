@@ -1,21 +1,17 @@
 {{- $root := . -}} #Need to do this to break out of the context of range
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "byceps.fullname" . }}
   namespace: {{ template "byceps.namespace" . }}
   labels:
     {{- include "byceps.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
       {{- include "byceps.selectorLabels" . | nindent 6 }}
-  minReadySeconds: 10
-  progressDeadlineSeconds: 600
-  strategy:
-    type: Recreate
   template:
     metadata:
       {{- with .Values.podAnnotations }}
