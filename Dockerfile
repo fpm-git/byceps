@@ -12,6 +12,7 @@ RUN useradd --create-home byceps
 WORKDIR /home/byceps
 USER byceps
 ENV PATH /home/byceps/.local/bin:$PATH
+ENV PYTHONPATH=/home/byceps/.local/lib/python3.11/site-packages:$PYTHONPATH
 
 # Install Python dependencies.
 # First, upgrade Pip itself.
