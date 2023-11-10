@@ -16,28 +16,6 @@ metadata:
   labels:
     {{- include "byceps.labels" . | nindent 4 }}
 spec:
-  rules:
-  {{- range .Values.ingress.hosts }}
-  - host: {{ .host | quote }}
-    http:
-      paths:
-      {{- range $ingressExtraPaths }}
-      - path: {{ default "/" .path | quote }}
-        backend:
-          service:
-            name: {{ $fullName }}-service
-            port:
-              number: {{ $svcPort }}
-        pathType: Prefix
-      {{- end }}
-      - path: {{ default "/" .path | quote }}
-        backend:
-          service:
-            name: {{ $fullName }}-service
-            port:
-              number: {{ $svcPort }}
-        pathType: Prefix
-  {{- end }}
   {{- if .Values.ingress.tls }}
   tls:
     {{- range .Values.ingress.tls }}
@@ -48,4 +26,19 @@ spec:
       secretName: {{ .secretName }}
     {{- end }}
   {{- end }}
-{{- end -}}
+  rules:
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .http.paths }}
+          - path: {{ .path }}
+            backend:
+              service:
+                name: {{ .backend.service.name }}
+                port:
+                  number: {{ .backend.service.port.number }}
+            pathType: {{.pathType}}
+          {{- end }}
+    {{- end }}
+  {{- end }}
