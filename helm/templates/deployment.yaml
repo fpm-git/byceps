@@ -114,7 +114,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          command: ["uwsgi", "--callable", "app", "--enable-threads", "--http-socket", "0.0.0.0:8083", "--lazy-apps", "--uwsgi-socket", "0.0.0.0:5003", "--wsgi-file", "serve.py"]
+          command: ["./worker.py"]
           env:
             {{- range $key, $value := .Values.env }}
             {{- if $value }}
