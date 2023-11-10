@@ -5,11 +5,13 @@ on:
     branches: [ main ]
     paths-ignore:
       - 'docs/**'
+      - 'helm/**'
       - '*.rst'
   pull_request:
     branches: [ main ]
     paths-ignore:
       - 'docs/**'
+      - 'helm/**'
       - '*.rst'
   # Allow manual workflow triggering from the "Actions" tab.
   workflow_dispatch:
