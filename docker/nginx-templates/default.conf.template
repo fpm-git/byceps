@@ -7,7 +7,7 @@ server {
     server_name byceps-admin.floatplaneinfra.com;
 
     location @byceps {
-        uwsgi_pass byceps-admin:5001;
+        uwsgi_pass byceps-admin.byceps:5001;
         include uwsgi_params;
         proxy_set_header Host $host;
     }
@@ -42,7 +42,7 @@ server {
     server_name byceps-site.floatplaneinfra.com;
 
     location @byceps {
-        uwsgi_pass byceps-site:5002;
+        uwsgi_pass byceps-site.byceps:5002;
         include uwsgi_params;
         proxy_set_header Host $host;
     }

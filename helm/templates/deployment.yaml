@@ -156,8 +156,11 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "nginx"
           ports:
-            - name: {{ .Values.service.portName }}
-              containerPort: {{ .Values.service.port }}
+            - name: admin
+              containerPort: 81
+              protocol: TCP
+            - name: site
+              containerPort: 82
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
