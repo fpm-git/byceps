@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: site-service
+  namespace: {{ template "byceps.namespace" . }}
+  labels:
+    {{- include "byceps.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: site-uwsgi
+      port: 5002
+      targetPort: 5002
+      protocol: TCP
+  selector:
+    {{- include "byceps.selectorLabels" . | nindent 4 }}

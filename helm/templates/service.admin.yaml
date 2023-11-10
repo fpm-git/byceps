@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: admin-service
+  namespace: {{ template "byceps.namespace" . }}
+  labels:
+    {{- include "byceps.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: admin-uwsgi
+      port: 5001
+      targetPort: 5001
+      protocol: TCP
+  selector:
+    {{- include "byceps.selectorLabels" . | nindent 4 }}
