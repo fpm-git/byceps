@@ -20,7 +20,7 @@ adminEnv:
 
 siteEnv:
   APP_MODE: site
-  SITE_ID: lmg
+  SITE_ID: cozylan
 
 workerEnv:
   APP_MODE: worker
