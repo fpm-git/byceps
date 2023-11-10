@@ -98,7 +98,7 @@ resources:
   # 1000m == 1 cpu thread
   limits:
     cpu: 500m
-    memory: 1024Mi
+    memory: 1Gi
   requests:
     memory: 128Mi
     cpu: 100m
@@ -131,5 +131,3 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-
-topologySpreadConstraints: []

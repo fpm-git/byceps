@@ -29,8 +29,6 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      topologySpreadConstraints:
-        {{- toYaml .Values.topologySpreadConstraints | nindent 8 }}
       containers:
         - name: byceps-admin
           securityContext:
@@ -58,8 +56,7 @@ spec:
             {{- end }}
             {{- end }}
           envFrom:
-            - name: dbsecrets
-              secretRef:
+            - secretRef:
                 name: {{ .Values.secrets.dbsecrets }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
@@ -68,10 +65,8 @@ spec:
           volumeMounts:
           - mountPath: /home/byceps/data
             name: data
-            readOnly: false
           - mountPath: /run/secrets/secret_key
             name: secretkey
-            readOnly: false
 
         - name: byceps-site
           securityContext:
@@ -99,8 +94,7 @@ spec:
             {{- end }}
             {{- end }}
           envFrom:
-            - name: dbsecrets
-              secretRef:
+            - secretRef:
                 name: {{ .Values.secrets.dbsecrets }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
@@ -109,10 +103,8 @@ spec:
           volumeMounts:
           - mountPath: /home/byceps/data
             name: data
-            readOnly: false
           - mountPath: /run/secrets/secret_key
             name: secretkey
-            readOnly: false
 
         - name: byceps-worker
           securityContext:
@@ -136,8 +128,7 @@ spec:
             {{- end }}
             {{- end }}
           envFrom:
-            - name: dbsecrets
-              secretRef:
+            - secretRef:
                 name: {{ .Values.secrets.dbsecrets }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
@@ -146,10 +137,8 @@ spec:
           volumeMounts:
           - mountPath: /home/byceps/data
             name: data
-            readOnly: false
           - mountPath: /run/secrets/secret_key
             name: secretkey
-            readOnly: false
 
         - name: web
           securityContext:
@@ -168,15 +157,12 @@ spec:
           volumeMounts:
           - mountPath: /etc/nginx/templates
             name: data
-            readOnly: false
             subPath: templates
           - mountPath: /var/www/byceps
             name: data
-            readOnly: false
             subPath: www
           - mountPath: /run/secrets/secret_key
             name: secretkey
-            readOnly: false
 
       volumes:
       - name: data
