@@ -35,11 +35,12 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           ports:
-            - name: {{ .Values.service.portName }}
-              containerPort: {{ .Values.service.port }}
+            - name: admin-http
+              containerPort: 8081
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          command: ["uwsgi", "--callable", "app", "--enable-threads", "--http-socket", "0.0.0.0:8081", "--lazy-apps", "--uwsgi-socket", "0.0.0.0:5001", "--wsgi-file", "serve.py"]
           env:
             {{- range $key, $value := .Values.env }}
             {{- if $value }}
@@ -73,11 +74,12 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           ports:
-            - name: {{ .Values.service.portName }}
-              containerPort: {{ .Values.service.port }}
+            - name: site-http
+              containerPort: 8082
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          command: ["uwsgi", "--callable", "app", "--enable-threads", "--http-socket", "0.0.0.0:8082", "--lazy-apps", "--uwsgi-socket", "0.0.0.0:5002", "--wsgi-file", "serve.py"]
           env:
             {{- range $key, $value := .Values.env }}
             {{- if $value }}
@@ -112,6 +114,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          command: ["uwsgi", "--callable", "app", "--enable-threads", "--http-socket", "0.0.0.0:8083", "--lazy-apps", "--uwsgi-socket", "0.0.0.0:5003", "--wsgi-file", "serve.py"]
           env:
             {{- range $key, $value := .Values.env }}
             {{- if $value }}
