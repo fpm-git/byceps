@@ -59,6 +59,8 @@ spec:
           envFrom:
             - secretRef:
                 name: {{ .Values.secrets.dbsecrets }}
+            - secretRef:
+                name: {{ .Values.secrets.secretkey }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
@@ -66,8 +68,6 @@ spec:
           volumeMounts:
           - mountPath: /home/byceps/data
             name: data
-          - mountPath: /run/secrets/secret_key
-            name: secretkey
 
         - name: byceps-site
           securityContext:
@@ -98,6 +98,8 @@ spec:
           envFrom:
             - secretRef:
                 name: {{ .Values.secrets.dbsecrets }}
+            - secretRef:
+                name: {{ .Values.secrets.secretkey }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
@@ -105,8 +107,6 @@ spec:
           volumeMounts:
           - mountPath: /home/byceps/data
             name: data
-          - mountPath: /run/secrets/secret_key
-            name: secretkey
 
         - name: byceps-worker
           securityContext:
@@ -133,6 +133,8 @@ spec:
           envFrom:
             - secretRef:
                 name: {{ .Values.secrets.dbsecrets }}
+            - secretRef:
+                name: {{ .Values.secrets.secretkey }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
@@ -164,8 +166,6 @@ spec:
           - mountPath: /var/www/byceps
             name: data
             subPath: www
-          - mountPath: /run/secrets/secret_key
-            name: secretkey
 
       volumes:
       - name: data
