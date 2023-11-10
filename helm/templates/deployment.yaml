@@ -38,6 +38,9 @@ spec:
             - name: admin-http
               containerPort: 8081
               protocol: TCP
+            - name: admin-uwsgi
+              containerPort: 5001
+              protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           command: ["uwsgi", "--callable", "app", "--enable-threads", "--http-socket", "0.0.0.0:8081", "--lazy-apps", "--uwsgi-socket", "0.0.0.0:5001", "--wsgi-file", "serve.py"]
@@ -76,6 +79,9 @@ spec:
           ports:
             - name: site-http
               containerPort: 8082
+              protocol: TCP
+            - name: site-uwsgi
+              containerPort: 5002
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
