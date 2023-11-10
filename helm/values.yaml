@@ -68,7 +68,7 @@ ingress:
   - hosts:
     - byceps-admin.floatplaneinfra.com
     - byceps.floatplaneinfra.com
-    secretName: floatplaneinfra-com-cf
+    secretName: floatplaneinfra-cf-cert
   hosts:
     - host: byceps-admin.floatplaneinfra.com
       http:
@@ -77,7 +77,7 @@ ingress:
             service:
               name: nginx-service
               port: 
-                number: 8081
+                number: 81
           path: /
           pathType: ImplementationSpecific
     - host: byceps.floatplaneinfra.com
@@ -87,7 +87,7 @@ ingress:
             service:
               name: nginx-service
               port: 
-                number: 8082
+                number: 82
           path: /
           pathType: ImplementationSpecific
 
