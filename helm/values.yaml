@@ -1,0 +1,135 @@
+# Default values for byceps.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+image:
+  repository: ghcr.io/fpm-git/byceps
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+imagePullSecrets: {}
+
+replicaCount: 1
+
+#env's used for all workloads
+env:
+  #test: test
+
+adminEnv:
+  APP_MODE: admin
+
+siteEnv:
+  APP_MODE: site
+  SITE_ID: lmg
+
+workerEnv:
+  APP_MODE: worker
+
+
+# These secrets need to be manually made
+secrets:
+  #https://github.com/byceps/byceps/blob/main/compose.yaml#L63
+  secretkey: secretkey-secret
+  dbsecrets: dbsecrets-secret
+
+persistence:
+  size: 25Gi
+  storageClass: csi-cinder-classic
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: "byceps-serviceaccount"
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext:
+  runAsUser: 0
+
+service:
+  type: ClusterIP
+  port: 5000
+  portName: https
+
+ingress:
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+  tls:
+  - hosts:
+    - byceps-admin.floatplaneinfra.com
+    - byceps.floatplaneinfra.com
+    secretName: floatplaneinfra-com-cf
+  hosts:
+    - host: byceps-admin.floatplaneinfra.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: nginx-service
+              port: 
+                number: 8081
+          path: /
+          pathType: ImplementationSpecific
+    - host: byceps.floatplaneinfra.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: nginx-service
+              port: 
+                number: 8082
+          path: /
+          pathType: ImplementationSpecific
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'. 
+  # 1000m == 1 cpu thread
+  limits:
+    cpu: 500m
+    memory: 1024Mi
+  requests:
+    memory: 128Mi
+    cpu: 100m
+
+
+readinessProbe:
+  # failureThreshold: 3
+  # httpGet:
+  #   path: /health
+  #   port: 80
+  #   scheme: HTTP
+  # initialDelaySeconds: 5
+  # periodSeconds: 2
+  # successThreshold: 2
+  # timeoutSeconds: 2
+
+livenessProbe:
+  # failureThreshold: 3
+  # httpGet:
+  #   path: /health
+  #   port: 80
+  #   scheme: HTTP
+  # initialDelaySeconds: 5
+  # periodSeconds: 2
+  # successThreshold: 1
+  # timeoutSeconds: 2
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+topologySpreadConstraints: []

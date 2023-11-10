@@ -1,0 +1,199 @@
+{{- $root := . -}} #Need to do this to break out of the context of range
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "byceps.fullname" . }}
+  namespace: {{ template "byceps.namespace" . }}
+  labels:
+    {{- include "byceps.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      {{- include "byceps.selectorLabels" . | nindent 6 }}
+  minReadySeconds: 10
+  progressDeadlineSeconds: 600
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "byceps.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      topologySpreadConstraints:
+        {{- toYaml .Values.topologySpreadConstraints | nindent 8 }}
+      containers:
+        - name: byceps-admin
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          ports:
+            - name: {{ .Values.service.portName }}
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            {{- range $key, $value := .Values.env }}
+            {{- if $value }}
+            - name: "{{ $key }}"
+              value: |-
+                {{ $value }}
+            {{- end }}
+            {{- end }}
+            {{- range $key, $value := .Values.adminEnv }}
+            {{- if $value }}
+            - name: "{{ $key }}"
+              value: |-
+                {{ $value }}
+            {{- end }}
+            {{- end }}
+          envFrom:
+            - name: dbsecrets
+              secretRef:
+                name: {{ .Values.secrets.dbsecrets }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          volumeMounts:
+          - mountPath: /home/byceps/data
+            name: data
+            readOnly: false
+          - mountPath: /run/secrets/secret_key
+            name: secretkey
+            readOnly: false
+
+        - name: byceps-site
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          ports:
+            - name: {{ .Values.service.portName }}
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            {{- range $key, $value := .Values.env }}
+            {{- if $value }}
+            - name: "{{ $key }}"
+              value: |-
+                {{ $value }}
+            {{- end }}
+            {{- end }}
+            {{- range $key, $value := .Values.siteEnv }}
+            {{- if $value }}
+            - name: "{{ $key }}"
+              value: |-
+                {{ $value }}
+            {{- end }}
+            {{- end }}
+          envFrom:
+            - name: dbsecrets
+              secretRef:
+                name: {{ .Values.secrets.dbsecrets }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          volumeMounts:
+          - mountPath: /home/byceps/data
+            name: data
+            readOnly: false
+          - mountPath: /run/secrets/secret_key
+            name: secretkey
+            readOnly: false
+
+        - name: byceps-worker
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            {{- range $key, $value := .Values.env }}
+            {{- if $value }}
+            - name: "{{ $key }}"
+              value: |-
+                {{ $value }}
+            {{- end }}
+            {{- end }}
+            {{- range $key, $value := .Values.workerEnv }}
+            {{- if $value }}
+            - name: "{{ $key }}"
+              value: |-
+                {{ $value }}
+            {{- end }}
+            {{- end }}
+          envFrom:
+            - name: dbsecrets
+              secretRef:
+                name: {{ .Values.secrets.dbsecrets }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          volumeMounts:
+          - mountPath: /home/byceps/data
+            name: data
+            readOnly: false
+          - mountPath: /run/secrets/secret_key
+            name: secretkey
+            readOnly: false
+
+        - name: web
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "nginx"
+          ports:
+            - name: {{ .Values.service.portName }}
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          volumeMounts:
+          - mountPath: /etc/nginx/templates
+            name: data
+            readOnly: false
+            subPath: templates
+          - mountPath: /var/www/byceps
+            name: data
+            readOnly: false
+            subPath: www
+          - mountPath: /run/secrets/secret_key
+            name: secretkey
+            readOnly: false
+
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: nginx-pvc
+      - name: secretkey
+        secret:
+          secretName: {{ .Values.secrets.secretkey }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
