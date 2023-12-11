@@ -98,8 +98,8 @@ resources:
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'. 
   # 1000m == 1 cpu thread
   limits:
-    cpu: 128Mi
-    memory: 500Gi
+    cpu: 400m
+    memory: 500Mi
   requests:
     memory: 128Mi
     cpu: 100m
